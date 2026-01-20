@@ -1,1 +1,71 @@
-<h1>Hello, this is my University Project Frontend!</h1>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل الطلاب - مشروع هدير</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; text-align: center; background-color: #f4f4f4; }
+        form { background: white; padding: 20px; display: inline-block; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input { display: block; margin: 10px auto; padding: 10px; width: 250px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        #message { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>تسجيل بيانات الطالب</h1>
+    
+    <form id="studentForm">
+        <input type="text" id="name" placeholder="اسم الطالب" required>
+        <input type="email" id="email" placeholder="البريد الإلكتروني" required>
+        <input type="text" id="department" placeholder="القسم" required>
+        <input type="text" id="studentID" placeholder="رقم القيد (ID)" required>
+        <button type="submit">تسجيل الآن</button>
+    </form>
+
+    <div id="message"></div>
+
+    <script>
+        const form = document.getElementById('studentForm');
+        const messageDiv = document.getElementById('message');
+
+        // ده اللينك بتاع الباك إند بتاعك على Azure اللي ربطناه بمونجو
+        const API_URL = "https://hadeer-backend-h8ecd4due8a7g8dh.switzerlandnorth-01.azurewebsites.net/add-student";
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            messageDiv.innerText = "جاري التسجيل...";
+
+            const studentData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                department: document.getElementById('department').value,
+                studentID: document.getElementById('studentID').value
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(studentData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    messageDiv.style.color = "green";
+                    messageDiv.innerText = result.message; // الرسالة اللي كاتبينها في الباك إند
+                    form.reset();
+                } else {
+                    messageDiv.style.color = "red";
+                    messageDiv.innerText = "فشل التسجيل: " + result.error;
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                messageDiv.style.color = "red";
+                messageDiv.innerText = "خطأ في الاتصال بالسيرفر!";
+            }
+        });
+    </script>
+</body>
+</html>
